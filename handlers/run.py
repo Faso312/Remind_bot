@@ -99,7 +99,6 @@ async def assign_route(message: Message, state: FSMContext):
     routs = routs_to_come_admin(get_values())
     try:
         if int(message.text) <=len(routs):
-            print(message.text)
             await state.update_data(user_ID=message.from_user.id,route=message.text)
             apply_route([message.from_user.id, str(routs[int(message.text)-1][0]),str(routs[int(message.text)-1][1])])
             await message.answer(f'Запись прошла успешно',reply_markup=ReplyKeyboardRemove())
