@@ -15,6 +15,10 @@ class Admin(StatesGroup):
     secret_key=State()
     hours=State()
 
+class Steps(StatesGroup):
+    step1=State()
+    step2=State()
+
 class Assign_route(StatesGroup):
     ID=State()
     route=State()
@@ -31,6 +35,7 @@ class User_data(StatesGroup):
 
 @router.callback_query(F.data == 'reg')
 async def registration(callback: types.CallbackQuery, state: FSMContext): 
+    await state.clear()
     await callback.message.answer(f'Отлично, начнем регистрацию⚡',reply_markup=make_row_keyboard(register))
     await state.set_state(User_data.ID)
     await callback.answer() #чистка оперативной памяти
@@ -48,13 +53,13 @@ async def reg_step1(message: Message, state: FSMContext):
         await state.set_state(Assign_route.route) #Устанавливаем пользователю состояние - выбирает ответ"
 
 @router.message(User_data.name,F.text)
-async def reg_step1(message: Message, state: FSMContext):
+async def reg_step2(message: Message, state: FSMContext):
     await state.update_data(user_ID=message.from_user.id,user_name=message.text)
     await message.answer(f'{user_int[1]}')
     await state.set_state(User_data.pf_number) #Устанавливаем пользователю состояние - выбирает ответ"
 
 @router.message(User_data.pf_number,F.text)
-async def reg_step2(message: Message, state: FSMContext):
+async def reg_step3(message: Message, state: FSMContext):
     await state.update_data(user_number=message.text)
     await message.answer(f'Регистрация прошла успешно',reply_markup=ReplyKeyboardRemove())
     user_data = await state.get_data()
@@ -62,18 +67,23 @@ async def reg_step2(message: Message, state: FSMContext):
     await state.clear()
 
 @router.callback_query(F.data == 'assign')
-async def call_asign(callback: types.CallbackQuery, state: FSMContext):
-    await state.clear() #чистка класса
-    if check_for_id(callback.message.from_user.id) is False:
-        await callback.message.answer(f'{user_int[0]}',reply_markup=ReplyKeyboardRemove())
+async def call_assign(callback: types.CallbackQuery, state: FSMContext): 
+    await state.clear()
+    await callback.message.answer(f'Отлично, выберите мероприятие⚡',reply_markup=make_row_keyboard(routs_kb))
+    await state.set_state(Steps.step1)
+    await callback.answer() #чистка оперативной памяти
+
+@router.message(Steps.step1,F.text.in_(routs_kb))
+async def call_assign1(message: Message, state: FSMContext):
+    if check_for_id(message.from_user.id) is True:
+        await message.answer(f'{user_int[0]}',reply_markup=ReplyKeyboardRemove())
         await state.set_state(User_data.name) #Устанавливаем пользователю состояние - "выбирает ответ"
     else: 
-        await callback.message.answer(f'{user_int[2]}',reply_markup=ReplyKeyboardRemove())
+        await message.answer(f'{user_int[2]}',reply_markup=ReplyKeyboardRemove())
         routs = routs_to_come_admin(get_values())
-        for rout in routs: await callback.message.answer(f'{routs.index(rout)+1}. {rout[0]}: {rout[1]}')
-        await callback.message.answer(f'Введите порядковый номер мероприятия, которое хотите посетить',reply_markup=ReplyKeyboardRemove())
+        for rout in routs: await message.answer(f'{routs.index(rout)+1}. {rout[0]}: {rout[1]}')
+        await message.answer(f'Введите порядковый номер мероприятия, которое хотите посетить',reply_markup=ReplyKeyboardRemove())
         await state.set_state(Assign_route.route) #Устанавливаем пользователю состояние - выбирает ответ"
-        await callback.answer() #чистка оперативной памяти
         
 
 
@@ -86,14 +96,14 @@ async def assign_route(message: Message, state: FSMContext):
     await state.clear()
 
 @router.callback_query(F.data == 'my_routs')
-async def registration(callback: types.CallbackQuery, state: FSMContext): 
+async def my_routs(callback: types.CallbackQuery, state: FSMContext): 
     await state.clear()
     await callback.message.answer(f'Отлично, нажмите для просмотра⚡',reply_markup=make_row_keyboard(routs_kb))
     await state.set_state(Route_list.route_ID)
     await callback.answer() #чистка оперативной памяти
 
 @router.message(Route_list.route_ID,F.text)
-async def reply_route(message: Message, state: FSMContext):
+async def my_routs1(message: Message, state: FSMContext):
     await message.answer(f'Ваши мероприятия',reply_markup=ReplyKeyboardRemove())
     for itr in get_user_routs(message.from_user.id): await message.answer(f'{itr}')
     await state.clear()
@@ -102,8 +112,8 @@ async def reply_route(message: Message, state: FSMContext):
 async def call_admin(callback: types.CallbackQuery, state: FSMContext):
     await state.clear() #чистка класса
     await callback.message.answer(f'Введите ключ авторизации',reply_markup=ReplyKeyboardRemove())
+    await state.set_state(Admin.secret_key)
     await callback.answer() #чистка оперативной памяти
-
 
 
 @router.message(Admin.secret_key,F.text)
@@ -122,7 +132,7 @@ async def call_update(callback: types.CallbackQuery, state: FSMContext):
     await callback.answer() #чистка оперативной памяти
 
 @router.message(Admin.hours,F.text)
-async def hours__update(message: Message, state: FSMContext):
+async def call_update1(message: Message, state: FSMContext):
     change_time(int(message.text))
     await message.answer(f'🕓Отлично, теперь оповещения будут приходить за {message.text} часов и за час до начала🕓',
                          reply_markup=ReplyKeyboardRemove())

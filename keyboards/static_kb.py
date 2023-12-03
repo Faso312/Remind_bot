@@ -7,7 +7,7 @@ def get_choice_keyboard():
     buttons.button(text='Регистрация', callback_data='reg')
     buttons.button(text='Записаться', callback_data='assign')
     buttons.button(text='Мои мероприятия', callback_data='my_routs')
-    buttons.button(text='Роль администратора', callback_data='admin')
+    buttons.button(text='Администратору', callback_data='admin')
     buttons.adjust(2)
     return buttons.as_markup()
 

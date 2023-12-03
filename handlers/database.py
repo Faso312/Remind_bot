@@ -90,7 +90,7 @@ def apply_route(user_data: list): #запись на мероприятие
     except TypeError:
         sh10.update_cell(sh10.find(str(user_data[1])).row, 4, str(user_data[0])) #добавление новых значений
         sh9.update_cell(sh9.find(str(user_data[0])).row, 4, str(data)) #добавление новых значений
-    #except AttributeError: return apply_route(user_data)
+    except AttributeError: return apply_route(user_data)
     
 def routs_to_come_admin(timetable: list) -> list: #список запланированных мероприятий
     routs_to_come_list=[] #локальный список запланированных мероприятий
