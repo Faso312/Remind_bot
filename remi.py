@@ -19,7 +19,7 @@ async def sending(): #функция цикличной рассылки опо�
                 for user_id in set(routs[2]): 
                     if user_id:await bot.send_message(chat_id=int(user_id), 
                                             text=f'{reply[0]} {routs[0]}{reply[1]} {routs[1]} {reply[2]}')
-            await asyncio.sleep(120) #проверка каждые __ секунд --- 1920 - 32 мин
+            await asyncio.sleep(1920) #проверка каждые __ секунд --- 1920 - 32 мин
     except KeyboardInterrupt: pass
 
 async def main(): #основная функция системы

@@ -120,9 +120,13 @@ async def my_routs(callback: types.CallbackQuery, state: FSMContext):
 
 @router.message(Route_list.route_ID,F.text)
 async def my_routs1(message: Message, state: FSMContext):
-    await message.answer(f'Ваши мероприятия',reply_markup=ReplyKeyboardRemove())
-    for itr in get_user_routs(message.from_user.id): await message.answer(f'{itr}')
-    await state.clear()
+    try:
+        await message.answer(f'Ваши мероприятия',reply_markup=ReplyKeyboardRemove())
+        for itr in get_user_routs(message.from_user.id): await message.answer(f'{itr}')
+        await state.clear()
+    except AttributeError:
+        await message.answer(f'Для начала пройдите регистрацию')
+        await state.clear()
 
 @router.callback_query(F.data == 'admin')
 async def call_admin(callback: types.CallbackQuery, state: FSMContext):

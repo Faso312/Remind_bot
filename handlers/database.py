@@ -108,6 +108,7 @@ def get_user_routs(user_id: str) ->list: #мероприятия пользов�
     except gspread.exceptions.APIError:
         on_hold(5)
         return get_user_routs(user_id)
+
     
 
 
