@@ -1,6 +1,6 @@
 import asyncio, logging
 from aiogram import Bot, Dispatcher
-from handlers import dispatcher, filters, run
+from handlers import dispatcher, help, run
 from handlers.database import token, timestep, get_values, reply, def_time
 
 
@@ -25,7 +25,7 @@ async def sending(): #функция цикличной рассылки опо�
 async def main(): #основная функция системы
     dp.include_router(dispatcher.router)
     dp.include_router(run.router)
-    dp.include_router(filters.router) 
+    dp.include_router(help.router) 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 

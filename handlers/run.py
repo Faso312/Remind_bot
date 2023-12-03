@@ -54,17 +54,25 @@ async def reg_step1(message: Message, state: FSMContext):
 
 @router.message(User_data.name,F.text)
 async def reg_step2(message: Message, state: FSMContext):
-    await state.update_data(user_ID=message.from_user.id,user_name=message.text)
-    await message.answer(f'{user_int[1]}')
-    await state.set_state(User_data.pf_number) #Устанавливаем пользователю состояние - выбирает ответ"
+    if len(message.text) < 100:
+        await state.update_data(user_ID=message.from_user.id,user_name=message.text)
+        await message.answer(f'{user_int[1]}')
+        await state.set_state(User_data.pf_number) #Устанавливаем пользователю состояние - выбирает ответ"
+    else: 
+        await message.answer(f'Слишком длинное значение, попробуйте снова',reply_markup=ReplyKeyboardRemove())
+        await state.set_state(User_data.name) #Устанавливаем пользователю состояние - "выбирает ответ"
 
 @router.message(User_data.pf_number,F.text)
 async def reg_step3(message: Message, state: FSMContext):
-    await state.update_data(user_number=message.text)
-    await message.answer(f'Регистрация прошла успешно',reply_markup=ReplyKeyboardRemove())
-    user_data = await state.get_data()
-    registration_user(list(user_data.values()))
-    await state.clear()
+    if len(message.text) < 15:
+        await state.update_data(user_number=message.text)
+        await message.answer(f'Регистрация прошла успешно',reply_markup=ReplyKeyboardRemove())
+        user_data = await state.get_data()
+        registration_user(list(user_data.values()))
+        await state.clear()
+    else: 
+        await message.answer(f'Слишком длинное значение, попробуйте снова',reply_markup=ReplyKeyboardRemove())
+        await state.set_state(User_data.pf_number) #Устанавливаем пользователю состояние - "выбирает ответ"
 
 @router.callback_query(F.data == 'assign')
 async def call_assign(callback: types.CallbackQuery, state: FSMContext): 
@@ -86,14 +94,22 @@ async def call_assign1(message: Message, state: FSMContext):
         await state.set_state(Assign_route.route) #Устанавливаем пользователю состояние - выбирает ответ"
         
 
-
 @router.message(Assign_route.route,F.text)
 async def assign_route(message: Message, state: FSMContext):
-    await state.update_data(user_ID=message.from_user.id,route=message.text)
     routs = routs_to_come_admin(get_values())
-    apply_route([message.from_user.id, str(routs[int(message.text)-1][0]),str(routs[int(message.text)-1][1])])
-    await message.answer(f'Запись прошла успешно',reply_markup=ReplyKeyboardRemove())
-    await state.clear()
+    try:
+        if int(message.text) <=len(routs):
+            print(message.text)
+            await state.update_data(user_ID=message.from_user.id,route=message.text)
+            apply_route([message.from_user.id, str(routs[int(message.text)-1][0]),str(routs[int(message.text)-1][1])])
+            await message.answer(f'Запись прошла успешно',reply_markup=ReplyKeyboardRemove())
+            await state.clear()
+        else: 
+            await message.answer(f'Попробуйте снова',reply_markup=ReplyKeyboardRemove())
+            await state.set_state(Assign_route.route) #Устанавливаем пользователю состояние - "выбирает ответ"
+    except ValueError: 
+        await message.answer(f'Отвечайте порядковым номером(числом) мероприятия',reply_markup=ReplyKeyboardRemove())
+        await state.set_state(Assign_route.route) #Устанавливаем пользователю состояние - "выбирает ответ"
 
 @router.callback_query(F.data == 'my_routs')
 async def my_routs(callback: types.CallbackQuery, state: FSMContext): 
@@ -133,10 +149,18 @@ async def call_update(callback: types.CallbackQuery, state: FSMContext):
 
 @router.message(Admin.hours,F.text)
 async def call_update1(message: Message, state: FSMContext):
-    change_time(int(message.text))
-    await message.answer(f'🕓Отлично, теперь оповещения будут приходить за {message.text} часов и за час до начала🕓',
-                         reply_markup=ReplyKeyboardRemove())
-    await state.clear()
+    try:
+        if len(message.text) <=2:
+            change_time(int(message.text))
+            await message.answer(f'🕓Отлично, теперь оповещения будут приходить за {message.text} часов и за час до начала🕓',
+                                reply_markup=ReplyKeyboardRemove())
+            await state.clear()
+        else:
+            await message.answer(f'Значения от часу до 24 часу до 24',reply_markup=ReplyKeyboardRemove())
+            await state.set_state(Admin.hours) #Устанавливаем пользователю состояние - "выбирает ответ"
+    except ValueError:
+        await message.answer(f'Попробуйте снова',reply_markup=ReplyKeyboardRemove())
+        await state.set_state(Admin.hours) #Устанавливаем пользователю состояние - "выбирает ответ"
 
 @router.callback_query(F.data == 'routs')
 async def call__routs(callback: types.CallbackQuery, state: FSMContext):
@@ -146,5 +170,11 @@ async def call__routs(callback: types.CallbackQuery, state: FSMContext):
     await state.clear()
 
 
+#except
+@router.message(User_data.ID)
+async def wrong_answer1(message: Message):  #проверка ответов
+    await message.answer(f'Нажмите для продолжения',reply_markup=make_row_keyboard(register))
 
-    
+@router.message(Steps.step1)
+async def wrong_answer1(message: Message):  #проверка ответов
+    await message.answer(f'Нажмите для продолжения',reply_markup=make_row_keyboard(routs_kb))
