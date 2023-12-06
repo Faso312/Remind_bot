@@ -1,7 +1,7 @@
 import asyncio, logging
 from aiogram import Bot, Dispatcher
 from handlers import dispatcher, help, run
-from handlers.database import token, timestep, get_values, reply, def_time
+from handlers.database import token, timestep
 
 
 logging.basicConfig(level=logging.INFO)
@@ -14,12 +14,14 @@ dp = Dispatcher()
 async def sending(): #функция цикличной рассылки оповещений
     try:
         while True:
+            """
+            
             data_list=timestep(get_values(), def_time) #присваевыем значение функции локальному списку
             for routs in data_list:
                 for user_id in set(routs[2]): 
                     if user_id:await bot.send_message(chat_id=int(user_id), 
-                                            text=f'{reply[0]} {routs[0]}{reply[1]} {routs[1]} {reply[2]}')
-            await asyncio.sleep(30) #проверка каждые __ секунд --- 1920 - 32 мин
+                                            text=f'{reply[0]} {routs[0]}{reply[1]} {routs[1]} {reply[2]}')"""
+            await asyncio.sleep(1920) #проверка каждые __ секунд --- 1920 - 32 мин
     except KeyboardInterrupt: pass
 
 async def main(): #основная функция системы
