@@ -55,6 +55,7 @@ def timestep(timetable: list, def_time: int) -> list: #получение id д�
         route_time = datetime.strptime(itr[4], "%d.%m.%Y %H:%M:%S") #строку во время
         dif_dates=curent_time - route_time #дни между числами
         dif_time=int(dif_dates.total_seconds()/60/60) #часы между числами
+        print(dif_time)
         if dif_time == -int(def_time) or dif_time == -1: time_list.extend([[itr[0],itr[1],itr[4]]])
     return time_list #вывод списка id с названием 
 
