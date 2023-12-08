@@ -27,7 +27,7 @@ async def sending(): #функция цикличной рассылки опо�
             data_list=timestep(get_users(),def_time) #присваевыем значение функции локальному списку
             for rout in data_list:
                     if rout:await bot.send_message(chat_id=int(rout[0]), text=f'{reply[0]}{rout[1]}{reply[1]}{rout[2]}{reply[2]}')
-            await asyncio.sleep(10) #проверка каждые __ секунд --- 2400 - 40 мин
+            await asyncio.sleep(2400) #проверка каждые __ секунд --- 2400 - 40 мин
     except KeyboardInterrupt: pass
 
 async def main(): #основная функция системы

@@ -56,7 +56,8 @@ async def my_routs1(message: Message, state: FSMContext):
     if check(list_,str(message.from_user.id)) is True: 
         await message.answer(f'Ваши мероприятия',reply_markup=ReplyKeyboardRemove())
         for itr in routs_to_come(get_user_routs(int(message.from_user.id), get_users())): 
-            await message.answer(f' - {itr[1]}')
+            if itr: await message.answer(f' - {itr[1]}')
+            else: await message.answer(f'У вас нет запланированных мероприятий')
         await state.clear()
     else: 
         await message.answer(f'Для начала пройдите регистрацию')

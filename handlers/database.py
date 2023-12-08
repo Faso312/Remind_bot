@@ -7,7 +7,7 @@ reply=['Здравствуйте, ','!\nНапоминаю вам о предс�
 user_int=['Регистрация прошла успешно, теперь вы будете получать уведомления📅🎉','Ваш номер не найден в базе данных, попробуйте еще раз или обратитесь за помощью к администратору','Отлично, начнем регистрацию⚡\nВведите свой номер в формате: 89271234567']
 token='6836856781:AAGtxQPztvNP_ClUNMqGHnpwIwWWdcvUNTE'
 routs_kb=['Мероприятия']
-def_time=6 #базовое время оповещения
+def_time=-6 #базовое время оповещения
 
 secret_key = gspread.service_account('Key.json') #подключение в json файлу библиотеки
 sh = secret_key.open("Remind_me_bot") #открытие таблицы с таким-то названием
@@ -55,8 +55,9 @@ def timestep(timetable: list, def_time: int) -> list: #получение id д�
         route_time = datetime.strptime(itr[4], "%d.%m.%Y %H:%M:%S") #строку во время
         dif_dates=curent_time - route_time #дни между числами
         dif_time=int(dif_dates.total_seconds()/60/60) #часы между числами
-        print(dif_time)
-        if dif_time == -int(def_time) or dif_time == -1: time_list.extend([[itr[0],itr[1],itr[4]]])
+        print(type(dif_time))
+        if dif_time == -6: time_list.extend([[itr[0],itr[1],itr[4]]])
+        elif dif_time == -1: time_list.extend([[itr[0],itr[1],itr[4]]])
     return time_list #вывод списка id с названием 
 
 def check_for_day(day: int, hour_ : int) ->bool: 
